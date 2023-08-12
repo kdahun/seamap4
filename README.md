@@ -118,6 +118,7 @@ currentLocation 변수의 위치에 마커를 추가하고, 마커의 타이틀�
 위 코드의 목적은 현재 위치 정보가 유효한 경우에 지도 상에 "현재 위치"라는 타이틀을 가진 마커를 추가하고, 해당 위치로 지도의 카메라를 이동시키는 것이다.
 
 ---
+
 '''
 fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
@@ -131,6 +132,7 @@ fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, locatio
         }
     });
 }
+
 '''
 위 코드는 안드로이드 애플리케이션에서 Fused Location Provider를 사용하여 현재 위치를 얻고, 해당 위치에 마커를 추가하여 지도를 이동하는 역할을 한다. Fused Location Provider는 안드로이드 위치 서비스 중 하나로, GPS, 네트워크, 센서 데이터 등을 결합하여 정확한 위치 정보를 제공하는 역할을 한다.
 1. LocationServices.getFusedLocationProviderClient(this); :
