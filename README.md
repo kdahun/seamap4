@@ -142,3 +142,21 @@ addOnSuccessListener는 위치 정보를 성공적으로 가져온 경우에 호
 location 객체가 null이 아닌 경우 location 객체에서 위도와 경도를 가져와서 currentLocation 변수에 LatLng 객체를 저장한다. 그리고 gMap(Google Maps 객체)에 현재 위치를 나타내는 마커를 추가하고, 지도의 카메라를 해당 위치로 이동시킨다.
 
 현재 위치 정보를 가져와서 지도 상에 마커를 표시하는 작업을 수행한다. 위치 권한을 확인하고, 위치 정보를 얻는 비동기적인 작업을 수행하는 코드이다.
+
+---
+'''
+private void onDataLodaed(){
+    mapFrag = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+    mapFrag.getMapAsync(this);
+}
+'''
+위 코드는 Adroid 애플리케이션에서 지도를 사용하기 위해 GoogleMaps API를 초기화하고 비동기 방식으로 지도를 가져오는 역할을 한다.
+1. mapFrag = (MapFragment) getFragmentManager().findFragmentById(R.id.map); :
+이 부분은 레이아웃 XML 파일에 정의된 지도 프래그먼트의 인스턴스를 가져온다. 프래그먼트는 안드로이드 액티비티 내에 다른 UI요소와 함께 조합될 수 있는 독자적인 UI요소이다. 'R.id.map'은 레이아웃 파일에서 지도 프래그먼트를 찾기 위해 사용되는 리소스 ID이다.
+2. mapFrag.getMapAsync(this); :
+이 부분은 비동기 방식으로 지도를 가져오도록 요청하는 부분이다. getMapAsync() 메서드는 지도를 가져오기 위해 Google Maps API에 요청하며, this 인자로 현재 클래스(또는 해당 메서드가 속한 클래스)를 콜백으로 전달합니다. 이렇게 하면 지도가 준비되었을때 this로 전달할 콜백 메서드(onMapReady())가 자동으로 호출된다.
+
+예를 들어, onMapReady() 라는 메서드가 현재 클래스에 존재한다면, 지도가 가져와지면 자동으로 onMapReady() 메서드가 호출되어 지도를 조작하거나 초기화하는 작업을 수행할 수 있다. 이를 통해 지도가 준비되었을 때 필요한 동작을 수행하도록 코드를 구성할 수 있다.
+
+---
+
