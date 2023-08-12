@@ -15,7 +15,7 @@
 (Android 애플리케이션에서 위치 정보를 제공하는 클래스이다. 안드로이드 스튜디오에서 위치 기반 애플리케이션을 개발할 때 사용되는 중요한 요소 중 하나이다. 위치 정보를 사용하는 앱은 사용자의 현재 위치를 파악하거나, 위치에 기반한 서비스를 제공하는 등 다양한 용도로 활용될 수 있다.
 FusedLocationProviderClient는 위치 정보를 효율적으로 제공하고, 다양한 위치 정보 소스(GPS, 네트워크 기반 위치, 센서 등)을 통합하여 개발자에게 사용하기 쉬운 API를 제공한다.
 일반적으로 'FusedLoactionProviderClient'를 사용하려면 위치 권한을 앱에 부여하고, 이를 통해 사용자의 위치 정보를 요청하고 처리하는 코드를 작성해야 한다. 위치 정보 업데이트를 받아오기 위해 리스너를 등록하고, 필요에 따라 위치 정보 업데이트 주기 등을 설정할 수 있다.)
-'''
+```
 import android.location.Location;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -40,7 +40,7 @@ if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageMana
             }
         });
 }
-'''
+```
 
 FusedLocationProviderClient를 사용하여 위치 정보를 얻고, addSuccessListener를 사용하여 위치 정보를 처리하고 있었다. 실제 앱에서는 위치 정보 업데이트 주기 등을 설정하고 필요한 위치 정보 처리를 수행하는 로직을 추가해야 한다.
 
@@ -100,12 +100,12 @@ calculateColorBaseOnDepth(waveSize.get(i))함수는 waveSize 리스트에서 값
 
 ---
 
-'''
+```
 if (currentLocation != null){
     currentLocationMarker = gMap.addMarker(new MarkerOptions().position(currentLocation).title("현재 위치"));
     gMap.moveCamera(CameraUpdateFactory.newLatLng(position));
 }
-'''
+```
 이 코드는 Google Maps API를 사용하는 현재 위치 정보가 유효한 경우에만 지도 상에 현재 위치를 나타내는 마커(Marker)를 추가하고, 해당 위치로 지도를 이동하는 역할을 한다.
 1. if(currentLocation != null){...} :
 이 부분은 currentLocation 변수가 null이 아닌 경우에만 안의 코드 블록을 실행한다. currentLocation은 지리적인 좌표 정보를 나타내는 변수로, 위도와 경도를 포함하는 LatLng 객체이다. 즉, 현재 위치 정보가 유효한 경우에만 해당 코드 블록이 실행된다.
@@ -119,7 +119,7 @@ currentLocation 변수의 위치에 마커를 추가하고, 마커의 타이틀�
 
 ---
 
-'''
+```
 fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
     return;
@@ -132,8 +132,7 @@ fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, locatio
         }
     });
 }
-
-'''
+```
 위 코드는 안드로이드 애플리케이션에서 Fused Location Provider를 사용하여 현재 위치를 얻고, 해당 위치에 마커를 추가하여 지도를 이동하는 역할을 한다. Fused Location Provider는 안드로이드 위치 서비스 중 하나로, GPS, 네트워크, 센서 데이터 등을 결합하여 정확한 위치 정보를 제공하는 역할을 한다.
 1. LocationServices.getFusedLocationProviderClient(this); :
 Fused Location Provider를 초기화하여 fusedLocationProviderClient 객체를 생성한다. 이 객체를 사용하여 위치 정보를 가져올 수 있다.
@@ -148,12 +147,12 @@ location 객체가 null이 아닌 경우 location 객체에서 위도와 경도�
 현재 위치 정보를 가져와서 지도 상에 마커를 표시하는 작업을 수행한다. 위치 권한을 확인하고, 위치 정보를 얻는 비동기적인 작업을 수행하는 코드이다.
 
 ---
-'''
+```
 private void onDataLodaed(){
     mapFrag = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
     mapFrag.getMapAsync(this);
 }
-'''
+```
 위 코드는 Adroid 애플리케이션에서 지도를 사용하기 위해 GoogleMaps API를 초기화하고 비동기 방식으로 지도를 가져오는 역할을 한다.
 1. mapFrag = (MapFragment) getFragmentManager().findFragmentById(R.id.map); :
 이 부분은 레이아웃 XML 파일에 정의된 지도 프래그먼트의 인스턴스를 가져온다. 프래그먼트는 안드로이드 액티비티 내에 다른 UI요소와 함께 조합될 수 있는 독자적인 UI요소이다. 'R.id.map'은 레이아웃 파일에서 지도 프래그먼트를 찾기 위해 사용되는 리소스 ID이다.
