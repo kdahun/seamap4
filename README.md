@@ -162,4 +162,5 @@ private void onDataLodaed(){
 예를 들어, onMapReady() 라는 메서드가 현재 클래스에 존재한다면, 지도가 가져와지면 자동으로 onMapReady() 메서드가 호출되어 지도를 조작하거나 초기화하는 작업을 수행할 수 있다. 이를 통해 지도가 준비되었을 때 필요한 동작을 수행하도록 코드를 구성할 수 있다.
 
 ---
-
+```
+private LocationRequese
