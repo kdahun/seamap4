@@ -64,6 +64,22 @@ FusedLocationProviderClient를 사용하여 위치 정보를 얻고, addSuccessL
 이 메서드는 Google Maps가 준비되었을 때 호출되며, 이를 통해 개발자가 지도를 커스터마이징하고 지도 작업을 수행할 수 있도록 해준다.
 ```
 @Override
-    
+public void onMapReady(@NonNull GoogleMap googleMap){
+    // 이 메서드가 호출되면 Google Maps가 준비된 상태이다.
+    // googleMap 객체를 사용하여 지도 작업을 수행하면 된다.
+
+    // 지도 유형 설정
+    googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+    // 예: 마커를 추가
+    LatLng location = new LatLng(37.7749, -122.4194); // 위도와 경도 설정
+    MarkderOptions markerOptions = new MarkerOptions().postion(location).title("San Francisco");// 마커 타이틀 설정
+
+    googleMap.addMarker(markerOptions);
+    // 예 : 지도 줌 레벨 조정
+    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location,12));
+}
 ```
+위 예시 코드에서 onMapReady 메서드에서는 지도가 준비되었을 때 호출되며 googleMap 객체를 사용하여 다양한 지도 작업을 수행하고 있다. 이 메서드는 MapView나 MapFragment에서 Google Maps가 초기화될 때 자동으로 호출되도록 설정되어야 한다.
+
 ---
