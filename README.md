@@ -56,13 +56,17 @@ FusedLocationProviderClient를 사용하여 위치 정보를 얻고, addSuccessL
 ### public void onMapReady(@NonNull GoogleMap googleMap)
 : Google Maps SDK의 OnMapReadyCallback 인터페이스에서 사용되는 콜백 메서드이다.
 
-        콜백 메서드? : 특정 이벤트나 상황이 발생했을 때 시스템이나 다른 코드에 의해 자동으로 호출되는 메서드이다. 이벤트가 발생하면 시스템이 등록된 콜백 메서드를 호출하여 필요한 작업을 수행할 수 있도록 하는 프로그래밍 패턴이다.
-        1. 비동기 작업 : 비동기 작업에서 결과가 준비되었을 때, 이를 처리하는 데 사용한다. 예를 들어, 파일 다운로드나 네트워크 요청의 완료 시점을 알리기 위해 콜백 메서드를 등록될 수 있다.
-        2. 이벤트 처리 : GUI 프로그래밍에서 버튼 클릭, 마우스 이벤트, 키보드 입력 등의 이벤트를 처리하기 위해 콜백 메서드가 사용된다.
-        3. 프레임워크나 라이브러리 사용 : 프레임 워크나 라이브러리에서 사용자 정의 코드가 호출되어야 할 때 콜백 메서드를 등록할 수 있다. 예를 들어, 안드로이드에서 위에서 설명한 onMapReady 메서드는 Google Maps SDK에서 제공하는 콜백 메서드이다.
-        4. 이벤트 기반 프로그래밍 : 이벤트 중심의 프로그래밍에서 발생하는 상황에 따라 콜백 메서드를 호출하여 로직을 실행하는 패턴이다.
+콜백 메서드? : 특정 이벤트나 상황이 발생했을 때 시스템이나 다른 코드에 의해 자동으로 호출되는 메서드이다. 이벤트가 발생하면 시스템이 등록된 콜백 메서드를 호출하여 필요한 작업을 수행할 수 있도록 하는 프로그래밍 패턴이다.
 
-        콜백 메서드는 인터페이스, 함수 포인터, 람다 함수 등을 통해 구현될 수 있으며, 이를 통해 코드의 모듈성과 재사용성을 높일 수 있다. 이벤트 기반의 프로그래밍에서 매우 중요한 역할을 하며, 비동기 작업과 이벤트 처리를 효율적으로 다루는 데 사용한다.
+1. 비동기 작업 : 비동기 작업에서 결과가 준비되었을 때, 이를 처리하는 데 사용한다. 예를 들어, 파일 다운로드나 네트워크 요청의 완료 시점을 알리기 위해 콜백 메서드를 등록될 수 있다.
+ 
+2. 이벤트 처리 : GUI 프로그래밍에서 버튼 클릭, 마우스 이벤트, 키보드 입력 등의 이벤트를 처리하기 위해 콜백 메서드가 사용된다.
+
+3. 프레임워크나 라이브러리 사용 : 프레임 워크나 라이브러리에서 사용자 정의 코드가 호출되어야 할 때 콜백 메서드를 등록할 수 있다. 예를 들어, 안드로이드에서 위에서 설명한 onMapReady 메서드는 Google Maps SDK에서 제공하는 콜백 메서드이다.
+    
+4. 이벤트 기반 프로그래밍 : 이벤트 중심의 프로그래밍에서 발생하는 상황에 따라 콜백 메서드를 호출하여 로직을 실행하는 패턴이다.
+
+콜백 메서드는 인터페이스, 함수 포인터, 람다 함수 등을 통해 구현될 수 있으며, 이를 통해 코드의 모듈성과 재사용성을 높일 수 있다. 이벤트 기반의 프로그래밍에서 매우 중요한 역할을 하며, 비동기 작업과 이벤트 처리를 효율적으로 다루는 데 사용한다.
 
 이 메서드는 Google Maps가 준비되었을 때 호출되며, 이를 통해 개발자가 지도를 커스터마이징하고 지도 작업을 수행할 수 있도록 해준다.
 ```
@@ -83,16 +87,20 @@ public void onMapReady(@NonNull GoogleMap googleMap){
     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location,12));
 }
 ```
+
 위 예시 코드에서 onMapReady 메서드에서는 지도가 준비되었을 때 호출되며 googleMap 객체를 사용하여 다양한 지도 작업을 수행하고 있다. 이 메서드는 MapView나 MapFragment에서 Google Maps가 초기화될 때 자동으로 호출되도록 설정되어야 한다.
 
 ---
 ### 마커를 직사각형 모양으로 바꾸고 색깔 지정
+
 1. Bitmap.createBitmap(48,48,Bitmap.Config.ARGB_888); :
 이 부분은 너비 48 픽셀, 높이 48 픽셀의 비트맵(이미지) 객체를 생성한다. 비트맵의 픽셀 포맷을 ARGB_888로 설정되어 있다.
 ARGB_8888 포맷은 알파 채녈과 빨강, 초록, 파랑(RGB) 채널을 8비트씩 사용하여 각 픽셀을 표현하는 방식이다.
+
 2. bitmap.eraseColor(calculateColorBaseOnDepth(waveSize.get(i))); :
 위에서 생성한 비트맵 객체의 모든 픽셀을 특정한 색으로 지우기 위해 eraseColor() 메서드를 호출한다.
 calculateColorBaseOnDepth(waveSize.get(i))함수는 waveSize 리스트에서 값을 가져와 해당 값을 기반으로 색상을 계산하는 함수이다. 이렇게 계산된 색상으로 비트맵을 채워진다.
+
 3. BitmapDescriptor markerIcon = BitmapDescriptorFactory.fromBitmap(bitmap); : 
 위에서 설정한 비트맵 객체를 사용하여 BitmapDescriptor 객체를 생성한다. 이 객체는 마커를 위한 아이콘을 나타내며, 이 아이콘을 지도 상에 마커로 표시할 때 사용한다. BitmapDescriptorFactory.fromBitmap() 메서드를 사용하여 비트맵에서 아이콘을 생성한다.
 
@@ -106,12 +114,16 @@ if (currentLocation != null){
     gMap.moveCamera(CameraUpdateFactory.newLatLng(position));
 }
 ```
+
 이 코드는 Google Maps API를 사용하는 현재 위치 정보가 유효한 경우에만 지도 상에 현재 위치를 나타내는 마커(Marker)를 추가하고, 해당 위치로 지도를 이동하는 역할을 한다.
+
 1. if(currentLocation != null){...} :
 이 부분은 currentLocation 변수가 null이 아닌 경우에만 안의 코드 블록을 실행한다. currentLocation은 지리적인 좌표 정보를 나타내는 변수로, 위도와 경도를 포함하는 LatLng 객체이다. 즉, 현재 위치 정보가 유효한 경우에만 해당 코드 블록이 실행된다.
+
 2. currentLocationMarker = gMap.addMarker(new MarkerOptions().position(currentLocation).title("현재 위치")); :
 이 부분에서는 gMap 객체(지도)에 마커를 추가한다.
 currentLocation 변수의 위치에 마커를 추가하고, 마커의 타이틀을 현재 위치로 설정한다. 마커를 추가한 결과는 currentLocationMarker변수에 저장된다. 이 변수는 이후에 마커를 제어할 때 사용될 수 있다.
+
 3. gMap.moveCamera(CameraUpdateFactory.newLatLng(position)); :
 마지막으로, 지도의 카메라를 현재 위치로 이동시키는 코드이다.
 
@@ -133,20 +145,26 @@ fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, locatio
     });
 }
 ```
+
 위 코드는 안드로이드 애플리케이션에서 Fused Location Provider를 사용하여 현재 위치를 얻고, 해당 위치에 마커를 추가하여 지도를 이동하는 역할을 한다. Fused Location Provider는 안드로이드 위치 서비스 중 하나로, GPS, 네트워크, 센서 데이터 등을 결합하여 정확한 위치 정보를 제공하는 역할을 한다.
+
 1. LocationServices.getFusedLocationProviderClient(this); :
 Fused Location Provider를 초기화하여 fusedLocationProviderClient 객체를 생성한다. 이 객체를 사용하여 위치 정보를 가져올 수 있다.
-2. 위치 권한 확인:
+
+3. 위치 권한 확인:
 ActivityCompat.checkSelfPermission를 사용하여 앱이 위치 권한을 가지고 있는지 확인한다. 만약 위치 권한이 없다면 if문 안에 사용자에게 위치 권한을 요청하는 로직을 구현해야한다. 위치 권한이 없으면 함수를 종료한다.
-3. 위치 정보 가져오기 : 
+
+4. 위치 정보 가져오기 : 
 fusedLocationProviderClient.getLastLocation().addOnSuccessListener를 사용하여 최근 위치 정보를 가져온다.
 addOnSuccessListener는 위치 정보를 성공적으로 가져온 경우에 호출되는 리스너이다.
-4. 위치 정보 처리 : 
+
+5. 위치 정보 처리 : 
 location 객체가 null이 아닌 경우 location 객체에서 위도와 경도를 가져와서 currentLocation 변수에 LatLng 객체를 저장한다. 그리고 gMap(Google Maps 객체)에 현재 위치를 나타내는 마커를 추가하고, 지도의 카메라를 해당 위치로 이동시킨다.
 
 현재 위치 정보를 가져와서 지도 상에 마커를 표시하는 작업을 수행한다. 위치 권한을 확인하고, 위치 정보를 얻는 비동기적인 작업을 수행하는 코드이다.
 
 ---
+
 ```
 private void onDataLodaed(){
     mapFrag = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
@@ -154,13 +172,82 @@ private void onDataLodaed(){
 }
 ```
 위 코드는 Adroid 애플리케이션에서 지도를 사용하기 위해 GoogleMaps API를 초기화하고 비동기 방식으로 지도를 가져오는 역할을 한다.
+
 1. mapFrag = (MapFragment) getFragmentManager().findFragmentById(R.id.map); :
 이 부분은 레이아웃 XML 파일에 정의된 지도 프래그먼트의 인스턴스를 가져온다. 프래그먼트는 안드로이드 액티비티 내에 다른 UI요소와 함께 조합될 수 있는 독자적인 UI요소이다. 'R.id.map'은 레이아웃 파일에서 지도 프래그먼트를 찾기 위해 사용되는 리소스 ID이다.
-2. mapFrag.getMapAsync(this); :
+
+3. mapFrag.getMapAsync(this); :
 이 부분은 비동기 방식으로 지도를 가져오도록 요청하는 부분이다. getMapAsync() 메서드는 지도를 가져오기 위해 Google Maps API에 요청하며, this 인자로 현재 클래스(또는 해당 메서드가 속한 클래스)를 콜백으로 전달합니다. 이렇게 하면 지도가 준비되었을때 this로 전달할 콜백 메서드(onMapReady())가 자동으로 호출된다.
 
 예를 들어, onMapReady() 라는 메서드가 현재 클래스에 존재한다면, 지도가 가져와지면 자동으로 onMapReady() 메서드가 호출되어 지도를 조작하거나 초기화하는 작업을 수행할 수 있다. 이를 통해 지도가 준비되었을 때 필요한 동작을 수행하도록 코드를 구성할 수 있다.
 
 ---
+
 ```
-private LocationRequese
+private LocationRequest locationRequest;
+private LocationCallback locationCallback;
+
+// 현재 위치 업데이트 요청 설정
+private void setupLoctionUpdate() {
+    locationRequest = LocationRequest.create();
+    locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    locationRequest.setInterval(5000); // 위치 업데이트 간격(5초)
+
+    locationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(@NonNull LocationResult locationResult) {
+            if (locationResult != null) {
+                for (android.location.Location location : locationResult.getLocations()) {
+                    // 새로운 위치를 받아서 처리
+                    updateCurrentLocation(location);
+                }
+            }
+        }
+    };
+}
+```
+
+1. private LocationRequest locationRequest;와 private LocationCallback locationCallback; :
+이 부분은 현재 위치 업데이트를 관리하기 위해 LocationRequest와 LocationCallback 객체를 선언한다.
+이 변수들은 나중에 위치 업데이트 설정 및 위치 업데이트 결과 처리에 사용된다.
+
+2. private void setupLocationUpdate() { ... } :
+setupLocationUpdate메서드는 위치 업데이트를 설정하기 위한 부분이다.
+    * locationRequest = LocationRequest.create(); : 위치 업데이트 요청을 생성한다.
+    * locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY); : 위치 업데이트의 우선순위를 높은 정확성으로 설정한다. 따라서 GPS 등 정확한 위치 정보 소스를 사용하도록 지정한다.
+    * locationRequest.setInterval(5000); : 위치 업데이트 간격을 5초로 설정한다. 즉, 매 5초마다 새로운 위치 정보를 업데이트 요청한다.
+    * locationCallback = new LocationCallback() { ... } : 위치 콜백 객체를 생성하고, 콜백 메서드인 onLocationResult를 재정의한다. 이 메서드는 위치 업데이트 결과가 있을 때 호출되며, 업데이트된 위치 정보를 처리하는 역할을 한다.
+
+3. public void onLocationResult(@NonNull LocationResult locationResult) { ... }; :
+이 메서드는 locationCallback 객체의 onLocationResult 콜백 메서드이다. 업데이트된 위치 정보가 있을 때 이 메서드가 호출된다.
+각 위치 정보를 처리하여 새로운 위치 updateCurrentLocation 메서드로 전달한다.
+
+4. updateCurrentLocation(Location location) :
+위치 정보를 받아서 처리하는 추상 메서드로, 실제 구현 없이 이 메서드를 호출하면 각 구현 클래스에서 위치 정보를 받아 처리할 수 있다.
+
+이 코드의 목적은 정확한 위치 정보를 주기적으로 업데이트하고, 업데이트된 위치를 처리하는 메커니즘을 설정하는 것이다.
+이는 위치 기반 서비스 및 앱에서 사용자의 위치를 추적하거나 위치 정보를 활용하는 작업에 유용하다.
+
+---
+```
+private void startLocationUpdates() {
+    //위치 업데이트 시작
+    fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        // TODO: Consider calling
+        //    ActivityCompat#requestPermissions
+        // here to request the missing permissions, and then overriding
+        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+        //                                          int[] grantResults)
+        // to handle the case where the user grants the permission. See the documentation
+        // for ActivityCompat#requestPermissions for more details.
+        return;
+    }
+    fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
+}
+```
+위 코드는 현재 위치 정보를 주기적으로 업데이트하도록 설정하는 역할을 한다. 이 업데이트는 애플리케이션이 사용자의 위치를 계속 추적하거나 위치 정보를 활용해야 하는 상황에서 유용하다.
+
+1. fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this); :
+위치 업데이트를 시작하기 위해 Fused Location Provider를 초기화하여 fusedLocationProviderClient 객체를 생성한다. 이 객체는 위치 없데이트를 관리하는 데 사용한다.
+2. 위치 
