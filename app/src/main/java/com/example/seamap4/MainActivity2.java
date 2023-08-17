@@ -40,6 +40,7 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolygonOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,6 +48,34 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
+
+
+class GridData{
+    int gridNumber;
+    double latitude;
+    double lonitude;
+
+    double wave;
+
+    public GridData(int gridNumber, double latitude, double lonitude, double wave){
+        this.gridNumber = gridNumber;
+        this.latitude = latitude;
+        this.lonitude = lonitude;
+        this.wave = wave;
+    }
+}
+
+class GridDataManager{
+    public List<GridData> gridDataList;
+    public GridDataManager(){
+        gridDataList = new ArrayList<>();
+    }
+
+    void addGrid(int number, double lat, double lng,double wave){
+        gridDataList.add(new GridData(number,lat,lng,wave));
+    }
+}
 
 public class MainActivity2 extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -59,8 +88,6 @@ public class MainActivity2 extends AppCompatActivity implements OnMapReadyCallba
     double[] lontitudeArr;
     GoogleMap gMap;
     MapFragment mapFrag;
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -91,8 +118,7 @@ public class MainActivity2 extends AppCompatActivity implements OnMapReadyCallba
     private void getData() {
         String url = "http://202.31.147.129:25003/weater.php";
 
-        //latitudeArr = new double[10];
-        //lontitudeArr = new double[10];
+
         lati = new ArrayList<Double>();                             // 위도 저장
         longti = new ArrayList<Double>();                           // 경도 저장
         waveSize = new ArrayList<Double>();                         // 파도 저장
@@ -180,15 +206,10 @@ public class MainActivity2 extends AppCompatActivity implements OnMapReadyCallba
             brightness = 254;
         }
         // Color.rgb에 색 밝기값을 넣어서 반환
-        return Color.rgb(brightness, 0, 0);
+        return brightness;
     }
-//    이건 직사각형 동적 크기 변경할려 했으나 렉이 걸려서 포기
-//    private LatLng adjustMarkerPosition(LatLng originalPosition, int index) {
-//        double offset = 0.0001 * index;
-//        return new LatLng(originalPosition.latitude + offset, originalPosition.longitude + offset);
-//    }
 
-    // 현재 위치 찍어주기-------------------------------------START-----------------------------------------------------------
+
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
     private void checkLocationPermission() {
@@ -221,14 +242,9 @@ public class MainActivity2 extends AppCompatActivity implements OnMapReadyCallba
             }
         }
     }
-    // 현재 위치 찍어주기----------------------------------END-----------------------------------------------------------
 
 
-//    private BitmapDescriptor createColoredMarkerIcon(int color) {
-//        float[] hsv = new float[3];
-//        Color.colorToHSV(color, hsv);
-//        return BitmapDescriptorFactory.defaultMarker(hsv[0]);
-//    }
+
 
     // 현재 위치 정보 제공 클라이언트
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -244,30 +260,24 @@ public class MainActivity2 extends AppCompatActivity implements OnMapReadyCallba
         // 위성 사진으로 변경
         gMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
 
+        GridDataManager manager = new GridDataManager(); //
+
         // 위도 배열 크기 만큼 반복
         for (int i = 0; i < lati.size(); i++) {
-            // 위도와 경도를 position 변수에 넣어 준다.
-            LatLng position = new LatLng(lati.get(i), longti.get(i));
+
+            manager.addGrid(i,lati.get(i), longti.get(i),waveSize.get(i));
+
+        }
 
 
-            // 마커 커스터 마이징
-            Bitmap bitmap = Bitmap.createBitmap(48, 48, Bitmap.Config.ARGB_8888);
-            bitmap.eraseColor(calculateColorBaseOnDepth(waveSize.get(i)));
-            BitmapDescriptor markerIcon = BitmapDescriptorFactory.fromBitmap(bitmap);
+        for (GridData data : manager.gridDataList) {
 
-            // position을 가지고 해구 찍어 주기
-            gMap.addMarker(new MarkerOptions()
-                    .position(position)
-                    .icon(markerIcon)
-                    .alpha(0.5f).flat(true).zIndex(1.0f)
-                    .title("Marker" + i));
+            PolygonOptions polygonOptions = createPolygonForCoordinate(data.latitude, data.lonitude);
+            int b = calculateColorBaseOnDepth(data.wave);
+            int fillColor = Color.argb(128 /*투명도*/, b, 0, 0);
+            polygonOptions.fillColor(fillColor);
 
-
-//            //  이 코드는 Google Maps API를 사용하여 현재 위치 정보가 유효한 경우에만 지도 상에 현재 위치를
-//            if(currentLocation!= null){
-//                currentLoactionMarker = gMap.addMarker(new MarkerOptions().position(currentLocation).title("현재 위치"));
-//                gMap.moveCamera(CameraUpdateFactory.newLatLng(position));
-//            }
+            googleMap.addPolygon(polygonOptions);
 
         }
 
@@ -283,15 +293,22 @@ public class MainActivity2 extends AppCompatActivity implements OnMapReadyCallba
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-//        // 현재 위치 가져와서 마커 추가
-//        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, location -> {
-//            if (location != null) {
-//                currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-//                gMap.addMarker(new MarkerOptions().position(currentLocation).title("현재 위치"));
-//                gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
-//            }
-//        });
+
     }
+
+    private PolygonOptions createPolygonForCoordinate(double latCenter, double lngCenter){
+        PolygonOptions rectOptions=new PolygonOptions()
+                .add(new LatLng(latCenter - 0.25 , lngCenter - 0.25))
+                .add(new LatLng(latCenter - 0.25 , lngCenter + 0.25))
+                .add(new LatLng(latCenter + 0.25 , lngCenter + 0.25))
+                .add(new LatLng(latCenter + 0.25 , lngCenter - 0.25))
+                .strokeWidth(2)
+                .strokeColor(Color.BLACK);
+
+        return rectOptions;
+    }
+
+
 
     private void onDataLodaed() {
         mapFrag = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
@@ -352,13 +369,6 @@ public class MainActivity2 extends AppCompatActivity implements OnMapReadyCallba
                 // 이미 마커가 있다면 위치만 업데이트
                 currentLoactionMarker.setPosition(newLatLng);
             }
-
-            gMap.moveCamera(CameraUpdateFactory.newLatLng(newLatLng));
-
-//            gMap.clear(); // 기존 마커 제거
-//            gMap.addMarker(new MarkerOptions().position(newLatLng).title("현재 위치"));
-//            gMap.moveCamera(CameraUpdateFactory.newLatLng(newLatLng));
-
 
             // 반경 원을 그리기 위한 설정
             CircleOptions circleOptions = new CircleOptions().
