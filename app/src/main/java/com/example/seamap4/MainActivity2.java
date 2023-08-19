@@ -6,10 +6,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,6 +19,7 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -41,6 +44,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,16 +52,20 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
+
+// 해구 번호, 위도, 경도, 파고를 저장하는 구조체?
 class GridData{
     int gridNumber;
     double latitude;
     double lonitude;
-
     double wave;
 
+    // 생성자
     public GridData(int gridNumber, double latitude, double lonitude, double wave){
         this.gridNumber = gridNumber;
         this.latitude = latitude;
@@ -66,6 +74,7 @@ class GridData{
     }
 }
 
+// GridData로 ArrayList를 만들어서  gridDataList에 저장
 class GridDataManager{
     public List<GridData> gridDataList;
     public GridDataManager(){
@@ -80,29 +89,31 @@ class GridDataManager{
 public class MainActivity2 extends AppCompatActivity implements OnMapReadyCallback {
 
     RequestQueue queue;
-    double[] latitudeArr;
+    //double[] latitudeArr;
 
     ArrayList<Double> lati;
     ArrayList<Double> longti;
     ArrayList<Double> waveSize;
-    double[] lontitudeArr;
+    //double[] lontitudeArr;
     GoogleMap gMap;
     MapFragment mapFrag;
 
+    double Current_lat;
+    double Current_log;
+
+    // 메뉴
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-
         menu.add(0,1,0,"실시간 파고");
         SubMenu subMenu = menu.addSubMenu("예측 파고 >>");
         subMenu.add(0,2,0,"10분");
-
         menu.add(0,3,0,"실시간 경로");
-
 
         return true;
     }
 
+    // 메뉴 클릭 이벤트
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch(item.getItemId()){
@@ -186,6 +197,7 @@ public class MainActivity2 extends AppCompatActivity implements OnMapReadyCallba
         });
         queue.add(stringRequest);
     }
+//========================================================================================================================
 
     private int calculateColorBaseOnDepth(double depth) {
         // 파고 높이별로 색 지정
@@ -209,7 +221,68 @@ public class MainActivity2 extends AppCompatActivity implements OnMapReadyCallba
         return brightness;
     }
 
+    // 추가: 최단 경로 데이터를 가져오는 함수
+    private void getShortestPathData() {
+        String url = "http://202.31.147.129:25003/shortest.php";
 
+        if (queue == null) {
+            queue = Volley.newRequestQueue(this);
+        }
+        // 서버에서 최단 경로 데이터 가져오기
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    JSONArray jsonArray = jsonObject.getJSONArray("shortest");
+
+                    // 최단 경로 위도 경도를 ArrayList에 저장
+                    ArrayList<LatLng> latLngs = new ArrayList<>();
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject item = jsonArray.getJSONObject(i);
+
+                        // 위도 저장
+                        double latitude = Double.parseDouble(item.getString("latitude"));
+
+                        // 경도 저장
+                        double longitude = Double.parseDouble(item.getString("longitude"));
+
+                        latLngs.add(new LatLng(latitude, longitude));
+                    }
+
+                    //이 부분에서 최단 경로 찍어줌.
+                    drawShortestPath(latLngs);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(), "오류발생", Toast.LENGTH_SHORT).show();
+            }
+        });
+        queue.add(stringRequest);
+    }
+
+    // 추가: 최단 경로 선 그리기 함수
+    private void drawShortestPath(ArrayList<LatLng> latLngs) {
+        if (gMap != null && latLngs != null && !latLngs.isEmpty()) {
+            for (int i = 0; i < latLngs.size() - 1; i++) {
+                LatLng start = latLngs.get(i);
+                LatLng end = latLngs.get(i + 1);
+
+                gMap.addPolyline(new PolylineOptions()
+
+                        .add(start, end)
+                        .width(5)
+                        .color(Color.BLUE)
+                );
+            }
+        }
+    }
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
     private void checkLocationPermission() {
@@ -230,20 +303,65 @@ public class MainActivity2 extends AppCompatActivity implements OnMapReadyCallba
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                onDataLodaed();
-            } else {
-                // 권한 거부됨
-                // 뭐 오류 떳는지 확인하고 싶을때 넣기
-            }
+// 오류 발생시 사용되는 메서드
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+//            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                onDataLodaed();
+//            } else {
+//                // 권한 거부됨
+//                // 뭐 오류 떳는지 확인하고 싶을때 넣기
+//            }
+//        }
+//    }
+
+// 데이터 POST 메서드
+    private void sendData() {
+        String url = "http://202.31.147.129:25003/get.php";
+
+        //사용자 디바이스 고유ID 가져오는 코드
+        String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        if (queue == null) {
+            queue = Volley.newRequestQueue(this);
         }
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                // 서버에서 전송된 결과를 처리할 코드를 합니다.
+                Toast.makeText(getApplicationContext(), "데이터 전송 완료", Toast.LENGTH_SHORT).show();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // 에러 발생 시 처리할 코드를 이곳에 작성하세요.
+                Toast.makeText(getApplicationContext(), "오류발생", Toast.LENGTH_SHORT).show();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+
+                Intent intent = getIntent();
+                //Toast.makeText(getApplicationContext(),intent.getStringExtra("destination_lat"),Toast.LENGTH_SHORT).show();
+                String destination_lat = intent.getStringExtra("destination_lat");
+                String destination_log = intent.getStringExtra("destination_log");
+
+
+                Map<String, String> params = new HashMap<>();
+                params.put("dest_latitude", String.valueOf(destination_lat)); // 목적지 경도
+                params.put("dest_longitude", String.valueOf(destination_log)); // 목적지 위도
+                params.put("cur_latitude", String.valueOf(Current_lat)); // 현재 경도
+                params.put("cur_longitude", String.valueOf(Current_log)); // 현재 위도
+                params.put("device_id", deviceId);
+                return params;
+            }
+        };
+
+        queue.add(stringRequest);
     }
-
-
 
 
     // 현재 위치 정보 제공 클라이언트
@@ -257,8 +375,8 @@ public class MainActivity2 extends AppCompatActivity implements OnMapReadyCallba
     public void onMapReady(@NonNull GoogleMap googleMap) {
         gMap = googleMap;
 
-        // 위성 사진으로 변경
-        gMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        LatLng korea = new LatLng(37, 128);
+        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(korea, 5));
 
         GridDataManager manager = new GridDataManager(); //
 
@@ -266,15 +384,13 @@ public class MainActivity2 extends AppCompatActivity implements OnMapReadyCallba
         for (int i = 0; i < lati.size(); i++) {
 
             manager.addGrid(i,lati.get(i), longti.get(i),waveSize.get(i));
-
         }
-
 
         for (GridData data : manager.gridDataList) {
 
             PolygonOptions polygonOptions = createPolygonForCoordinate(data.latitude, data.lonitude);
             int b = calculateColorBaseOnDepth(data.wave);
-            int fillColor = Color.argb(128 /*투명도*/, b, 0, 0);
+            int fillColor = Color.argb(178 /*투명도*/, b, 0, 0);
             polygonOptions.fillColor(fillColor);
 
             googleMap.addPolygon(polygonOptions);
@@ -330,6 +446,13 @@ public class MainActivity2 extends AppCompatActivity implements OnMapReadyCallba
             public void onLocationResult(@NonNull LocationResult locationResult) {
                 if (locationResult != null) {
                     for (android.location.Location location : locationResult.getLocations()) {
+
+                        // 현재 위치의 경위도 값을 변수에 저장
+                        Current_lat = location.getLatitude();
+                        Current_log = location.getLongitude();
+                        sendData();
+
+                        Toast.makeText(getApplicationContext(),Current_lat+":"+Current_log,Toast.LENGTH_SHORT).show();
                         // 새로운 위치를 받아서 처리
                         updateCurrentLocation(location);
                     }
@@ -339,7 +462,7 @@ public class MainActivity2 extends AppCompatActivity implements OnMapReadyCallba
     }
 
     private void startLocationUpdates() {
-        //위치 업데이트 시작
+        //위치 업데이트 시작+
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
@@ -386,7 +509,7 @@ public class MainActivity2 extends AppCompatActivity implements OnMapReadyCallba
             currentCircle = gMap.addCircle(circleOptions);
 
             // 위치 업데이트 발생 시 Toast 메시지 표시
-            Toast.makeText(this,"현재 위치가 업데이트 되었습니다",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this,"현재 위치가 업데이트 되었습니다",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -407,7 +530,8 @@ public class MainActivity2 extends AppCompatActivity implements OnMapReadyCallba
         // 현재 위치 갱신 시작
         startLocationUpdates();
 
+        // 추가: 최단 경로 데이터 가져오기
+        getShortestPathData();
     }
-
 
 }

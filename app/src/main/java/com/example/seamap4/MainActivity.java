@@ -4,23 +4,16 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.telephony.TelephonyManager;
 import android.content.Context;
+
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -29,8 +22,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.HashMap;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -42,8 +33,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
+        // googleMap 객체만들기
         googleMap1 = googleMap;
 
+
+        // 위치를 한국으로 위치 변경
         LatLng korea = new LatLng(38, 128);
         googleMap1.moveCamera(CameraUpdateFactory.newLatLngZoom(korea, 5));
 
@@ -51,54 +45,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onMapClick(@NonNull LatLng latLng) {
                 if (des == null) {
+                    // des는 마커가 현재 찍혀 있는지 아닌지 확인하는 변수
+                    // 마커 찍기
                     des = googleMap1.addMarker(new MarkerOptions().position(latLng).title("destination"));
+
+                    //lat에 위도 저장
                     lat = latLng.latitude;
+
+                    //log에 경도 저장
                     log = latLng.longitude;
                 } else {
+                    // 마커 위치 변경
                     des.setPosition(latLng);
+
+                    // 위도 저장
                     lat = latLng.latitude;
+
+                    // 경도 저장
                     log = latLng.longitude;
                 }
                 Log.d("lat,log : ", lat + " ," + log);
             }
         });
     }
-
-    private void sendData(double latitude, double longitude) {
-        String url = "http://202.31.147.129:25003/get.php";
-
-        String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-
-        if (queue == null) {
-            queue = Volley.newRequestQueue(this);
-        }
-
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                // 서버에서 전송된 결과를 처리할 코드를 합니다.
-                Toast.makeText(getApplicationContext(), "데이터 전송 완료", Toast.LENGTH_SHORT).show();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                // 에러 발생 시 처리할 코드를 이곳에 작성하세요.
-                Toast.makeText(getApplicationContext(), "오류발생", Toast.LENGTH_SHORT).show();
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("latitude", String.valueOf(latitude));
-                params.put("longitude", String.valueOf(longitude));
-                params.put("device_id", deviceId); // 디바이스 고유 ID를 추가
-                return params;
-            }
-        };
-
-        queue.add(stringRequest);
-    }
-
 
 
     @Override
@@ -108,6 +77,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         Button btn = (Button) findViewById(R.id.button);
 
+
+        // fragement에 googlemap 띄우기
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.frameLayout);
 
@@ -123,9 +94,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendData(lat, log);
+                //sendData(lat, log);
 
+                // 버튼을 누르면 intent로 넘어가기 , 목적지 위도 경도는 넘겨줌
                 Intent intent = new Intent(getApplicationContext(), MainActivity2.class);
+                intent.putExtra("destination_lat",String.valueOf(lat));
+                intent.putExtra("destination_log",String.valueOf(log));
                 startActivity(intent);
             }
         });

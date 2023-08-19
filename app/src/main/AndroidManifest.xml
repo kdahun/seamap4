@@ -16,8 +16,10 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
 
+    <!-- 모바일 고유 id 호출 코드 -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE"
-        android:maxSdkVersion="29" />     <!-- 모바일 고유 id 호출  -->
+        android:maxSdkVersion="29" />
+    <!-- ===================== -->
 
     <meta-data
         android:name = "com.google.android.gms.version"
